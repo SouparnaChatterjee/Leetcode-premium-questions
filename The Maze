@@ -1,0 +1,115 @@
+The problem you're referring to, **"The Maze"**, can be found on LeetCode with the following details:
+
+### Problem Overview:
+You are given an `m x n` maze represented by a 2D grid. The maze contains:
+- `0` for open paths.
+- `1` for walls.
+- The goal is to determine whether there is a path from a starting point `(start)` to an ending point `(destination)`.
+
+The problem requires checking if a ball can travel from the starting point to the destination by moving in one of the four directions: **up**, **down**, **left**, or **right**, but the ball stops when it hits a wall (`1`).
+
+---
+
+### Key Points:
+- The ball can only move in straight lines.
+- The ball continues moving in a direction until it hits a wall, after which it stops and you can change direction.
+- You need to return `true` if a path exists from the start to the destination and `false` otherwise.
+
+### Constraints:
+- The ball must move continuously in a direction (can't change directions in the middle of a step).
+- The maze has boundaries, so you can't move outside of the grid.
+
+---
+
+### Approach:
+
+To solve this problem, a **Breadth-First Search (BFS)** or **Depth-First Search (DFS)** approach can be applied to explore all possible paths. Here’s how you could approach this problem:
+
+1. **DFS/BFS Traversal**:
+   - Start from the `start` position and attempt to move in all four directions.
+   - The ball can move until it hits a wall. At each stop, we check if we've reached the destination.
+   - If we reach the destination, return `true`.
+   - If we exhaust all possible directions and can't reach the destination, return `false`.
+
+2. **Mark Visited**:
+   - Use a `visited` array to keep track of the cells you have already visited to avoid cycles and redundant work.
+
+---
+
+### Solution Using DFS (Depth-First Search):
+```cpp
+class Solution {
+public:
+    bool canReachDestination(vector<vector<int>>& maze, vector<int>& start, vector<int>& destination) {
+        int m = maze.size(), n = maze[0].size();
+        vector<vector<bool>> visited(m, vector<bool>(n, false));
+        
+        // Directions for up, down, left, and right
+        vector<pair<int, int>> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+        
+        // Helper function for DFS
+        bool dfs(int x, int y) {
+            // Base case: if out of bounds or already visited
+            if (x < 0 || x >= m || y < 0 || y >= n || maze[x][y] == 1 || visited[x][y]) {
+                return false;
+            }
+            // Mark the current cell as visited
+            visited[x][y] = true;
+            // If we reached the destination, return true
+            if (x == destination[0] && y == destination[1]) {
+                return true;
+            }
+            
+            // Explore all four directions
+            for (auto& dir : directions) {
+                int nx = x, ny = y;
+                // Move in the current direction until hitting a wall
+                while (nx + dir.first >= 0 && nx + dir.first < m && ny + dir.second >= 0 && ny + dir.second < n && maze[nx + dir.first][ny + dir.second] == 0) {
+                    nx += dir.first;
+                    ny += dir.second;
+                }
+                // Recursive DFS from the new position
+                if (dfs(nx, ny)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        // Start DFS from the start position
+        return dfs(start[0], start[1]);
+    }
+};
+```
+
+### Explanation:
+- **DFS**: We use Depth-First Search to explore all possible paths starting from the `start` position.
+- **Direction Movement**: We check all four possible directions (up, down, left, right). For each direction, we move until the ball hits a wall (`1`) and then recursively check from that position.
+- **Base Case**: If the ball reaches the destination, return `true`. If it's out of bounds, hits a wall, or revisits a position, return `false`.
+
+### Complexity:
+- **Time Complexity**: \(O(m \times n)\), since in the worst case, we may visit every cell once.
+- **Space Complexity**: \(O(m \times n)\), for the visited array and recursive stack space.
+
+---
+
+### Example:
+
+Input:
+```plaintext
+maze = [
+ [0, 0, 1, 0, 0],
+ [0, 0, 0, 1, 0],
+ [1, 1, 0, 1, 0],
+ [0, 0, 0, 0, 0]
+]
+start = [0, 4]
+destination = [3, 2]
+```
+
+Output: `true`
+
+### Explanation:
+- The ball can move from `(0, 4)` to `(0, 1)` and continues until it reaches the destination at `(3, 2)`.
+
+Let me know if you'd like further clarification or a different approach!
