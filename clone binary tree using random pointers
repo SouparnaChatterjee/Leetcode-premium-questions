@@ -1,0 +1,61 @@
+#include <unordered_map>
+using namespace std;
+
+class Node {
+public:
+    int val;
+    Node* left;
+    Node* right;
+    Node* random;
+    
+    Node(int _val) {
+        val = _val;
+        left = NULL;
+        right = NULL;
+        random = NULL;
+    }
+};
+
+class Solution {
+public:
+    unordered_map<Node*, Node*> mp;  // Maps original node to cloned node
+
+    Node* cloneTree(Node* root) {
+        if (!root) return NULL;
+        
+        // Step 1: Create a copy of each node and store it in the hashmap
+        Node* clonedRoot = new Node(root->val);
+        mp[root] = clonedRoot;
+
+        // Recursively clone left and right subtrees
+        clonedRoot->left = cloneTree(root->left);
+        clonedRoot->right = cloneTree(root->right);
+        
+        return clonedRoot;
+    }
+
+    void copyRandomPointers(Node* root, Node* clonedRoot) {
+        if (!root) return;
+        
+        // Step 2: Set the random pointer using the hashmap
+        if (root->random) {
+            clonedRoot->random = mp[root->random];
+        }
+        
+        // Recursively copy random pointers
+        copyRandomPointers(root->left, clonedRoot->left);
+        copyRandomPointers(root->right, clonedRoot->right);
+    }
+
+    Node* copyRandomBinaryTree(Node* root) {
+        if (!root) return NULL;
+        
+        // Step 1: Clone tree structure (without random pointers)
+        Node* clonedRoot = cloneTree(root);
+        
+        // Step 2: Copy random pointers
+        copyRandomPointers(root, clonedRoot);
+        
+        return clonedRoot;
+    }
+};
